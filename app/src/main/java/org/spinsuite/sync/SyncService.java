@@ -244,7 +244,7 @@ public class SyncService extends IntentService {
 			return;
 		}
 
-		List<MSPSSyncMenu> sm = MSPSSyncMenu.getNodes(this, "0", InitialLoad.INITIALLOAD_ServiceDefinition,
+		List<MSPSSyncMenu> sm = MSPSSyncMenu.getNodes(this, "50190", InitialLoad.INITIALLOAD_ServiceDefinition,
 				InitialLoad.INITIALLOAD_ServiceMethodDataSynchronization, null, null);
 
 		try {
