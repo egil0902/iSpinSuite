@@ -52,22 +52,35 @@ public class MSPSSyncMenu extends X_SPS_SyncMenu{
 				"wst.Value As ValueType, " + //4
 				"wsm.Value As ValueMethod " + //5
 			"FROM " +
-			"AD_Tree tree " + 
-			"INNER JOIN AD_Table tab ON tree.AD_Table_ID = tab.AD_Table_ID " +
+			"AD_Tree tree " +
+
 			"INNER JOIN AD_TreeNode treend On treend.AD_Tree_ID = tree.AD_Tree_ID "+
 			"LEFT JOIN (SELECT Count(1) Qty,Parent_ID,AD_Tree_ID FROM AD_TreeNode GROUP BY Parent_ID,AD_Tree_ID) " +
 				"hasnodes ON hasnodes.Parent_ID=treend.Node_ID AND hasnodes.AD_Tree_ID=treend.AD_Tree_ID " +
 			"INNER JOIN SPS_SyncMenu sm ON treend.Node_ID = sm.SPS_SyncMenu_ID " +
+				"INNER JOIN SPS_table tab on sm.SPS_table_id=tab.SPS_table_id "+
 			"INNER JOIN WS_WebService ws ON sm.WS_WebService_ID = ws.WS_WebService_ID " +
 			"LEFT JOIN WS_WebServiceType wst ON sm.WS_WebServiceType_ID = wst.WS_WebServiceType_ID " +
 			"LEFT JOIN WS_WebServiceMethod wsm ON sm.WS_WebServiceMethod_ID = wsm.WS_WebServiceMethod_ID " +
-				"OR wst.WS_WebServiceMethod_ID = wsm.WS_WebServiceMethod_ID " +
-			"WHERE tab.TableName = ? AND treend.Parent_ID = ? AND ws.Value = ? AND sm.IsActive ='Y'" +
-			"ORDER By treend.SeqNo ";
+				"OR wst.WS_WebServiceMethod_ID = wsm.WS_WebServiceMethod_ID ";
+		if(p_ParentNode.compareTo("50190")==0) {
+			sql+=" WHERE treend.Parent_ID = ? AND ws.Value = ? AND sm.IsActive ='Y' ";
+		}else{
+			sql+=" WHERE tab.TableName = ? AND treend.Parent_ID = ? AND ws.Value = ? AND sm.IsActive ='Y' ";
+		}
+			sql+=" ORDER By treend.SeqNo ";
 		
 		try{
-			
-			rs = conn.querySQL(sql, new String[]{MSPSSyncMenu.Table_Name, p_ParentNode, p_WebServiceDefinitionValue});
+			String tn=Table_Name;
+			if(tn==null)
+				tn="SPS_SyncMenu";
+			if(p_ParentNode.compareTo("50190")==0) {
+				rs = conn.querySQL(sql, new String[]{p_ParentNode, p_WebServiceDefinitionValue});
+			}else{
+				rs = conn.querySQL(sql, new String[]{tn, p_ParentNode, p_WebServiceDefinitionValue});
+			}
+
+
 			
 			if(rs.moveToFirst()){
 	    		do{
